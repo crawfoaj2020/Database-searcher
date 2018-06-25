@@ -21,13 +21,10 @@
 ;;; DEALINGS IN THE SOFTWARE.
 
 #!chezscheme
-(library (swish helpers)
+(library (helpers)
   (export
-   respond
-   do-query
    string-param
    integer-param
-   schema->html
    previous-sql-valid?
    stringify
    trim-whitespace
@@ -39,126 +36,22 @@
    (chezscheme)
    (swish imports))
 
-  (define-syntax respond
-  (syntax-rules ()
-    [(_ c1 c2 ...)
-     void]))
-
-;; Running a query
-(define (do-query db sql limit offset type f)
-  (define (nav-form where from-offset enabled?)
-    `(form (@ (name "query") (method "get"))
-       (textarea (@ (name "sql") (class "hidden")) ,sql)
-       (input (@ (name "limit") (class "hidden") (value ,(stringify limit))))
-       (input (@ (name "offset") (class "hidden") (value ,(stringify from-offset))))
-       (input (@ (name "type") (class "hidden") (value ,(stringify type))))
-       (button ,(if enabled? 
-                    '(@ (type "submit"))
-                    '(@ (type "submit") (disabled)))
-         ,(stringify where))))
-  (define (get-results next-row f)
-    (let lp ([results '()])
-      (match (next-row)
-        [#f (reverse results)]
-        [,row (lp (cons (f row) results))])))
-  (define (row->tr row)
-    `(tr ,@(map value->td (vector->list row))))
-  (define (value->td v)
-    `(td ,(cond
-           [(bytevector? v) `(i "Binary data")]
-           [(not v) "<null>"]
-           [else (stringify v)])))
-  (match-let*
-   ([,stmt (sqlite:prepare db (format "~a limit ? offset ?" sql))]
-    [,_ (sqlite:bind stmt (list limit  offset))]
-    [,results (get-results (lambda () (sqlite:step stmt)) row->tr)]
-    [,count (length results)])
-   (if (= count 0)
-       (respond (section "Query finished" `(p ,(home-link sql))))
-       (respond
-        
-        `(table
-          (tr (@ (style "text-align: center;"))
-            (td (@ (class "navigation"))
-              ,(nav-form "Previous Page" (max 0 (- offset limit)) (> offset 0)))
-            (td (@ (class "navigation"))
-              (form (@ (id "rowForm") (method "get"))
-                (textarea (@ (name "sql") (class "hidden")) ,sql)
-                (input (@ (name "limit") (class "hidden") (value ,(stringify limit))))
-                (input (@ (name "type") (class "hidden") (value ,(stringify type))))
-                (button (@ (id "offsetButton") (type "submit")) "Go to row")
-                (p (input (@ (id "offsetInput") (name "offset") (class "offset"))))))
-            (td (@ (class "navigation"))
-              ,(nav-form "Next Page" (+ offset limit) (= count limit)))
-            (td (@ (class "link"))
-              ,(home-link sql))))
-        (section (format "Rows ~d to ~d" (+ offset 1) (+ offset count))
-          (match (cons (sqlite:columns stmt) (sqlite:execute stmt '()))
-            [(,cols . ,rows) (data->html-table 1 cols rows f)]))))))
-
-(define (make-td c r)
-  (let* ([text (format "~a" r)]
-        [len (string-length text)])
-    (cond
-     [(< len 64)
-      `(td (@ (class "narrow")) ,text)]
-     [(< len 256)
-      `(td (@ (class "normal")) ,text)]
-     [(< len 512)
-      `(td (@ (class "wide")) ,text)]
-     [else
-      (let ([id (symbol->string (gensym))])
-          `(td (@ (class "extra-wide")) (div (@ (class ,(format "elide ~a" c)) (word-break "break-all"))
-            (input (@ (class "elide") (id ,id) (type "checkbox") (checked "yes")))
-            (label (@ (for ,id) (class "elide")) ,text))))])))
-     
-(define (data->html-table border columns rows f)
-  (define (widths ls-cols)
-    (let* ([num-cols (length ls-cols)]
-           [min (round (/ (/ 100 num-cols) 2))]
-           [max (round (* (/ 100 num-cols) 2))])
-      `(@ (max-width ,max) (min-width ,min) )))
-     ; `(p ,min "%"))) 
-           
-  (let ([columns (vector->list columns)])
-    `(div (@ (class "dataCont"))
-    (table (@ (class "dataTable"))
-     (tbody
-       (tr ,@(map (lambda (c) `(th  ,c)) columns))
-       ,@(map
-          (lambda (row)
-            `(tr ,@(map make-td columns (apply f (vector->list row)))))
-          rows))))))
-
 ;;Common helpers
-(define (string-param name)
-    (let ([value (find-param name)])
+(define (string-param name params)
+    (let ([value (http:find-param name params)])
       (and value (trim-whitespace value))))
 
-(define (integer-param name min-value)
-    (let* ([string-value (find-param name)]
+(define (integer-param name min-value params)
+    (let* ([string-value (http:find-param name params)]
            [number-value (and string-value (string->number string-value))])
       (and string-value
            (if (and (integer? number-value) (>= number-value min-value))
                number-value
                (raise `#(bad-integer-param ,name ,min-value ,number-value))))))
 
-(define (schema->html db-tables)
-  (define (db-table->tr table)
-    (match table
-      [(,name . ,columns)
-       (subsection (stringify name)
-         `(table ,@(map column->tr columns)))]))
-  (define (column->tr column-type)
-    (match column-type
-      [(,column . ,type)
-       `(tr (td ,(stringify column))
-          (td ,type))]))
-  `(div (@ (class "schema"))
-     ,@(map db-table->tr db-tables)))
-
 (define (previous-sql-valid? sql)
-   (and sql (not (string=? sql ""))))
+  (and sql (not (string=? sql ""))))
+
 
 ;; String manipulation
 (define (stringify x) (format "~a" x))
@@ -198,14 +91,14 @@
 (define string-replace 
    (lambda (s match replacement)
       (let ((ll (string->list s)))
-         (if (= (string-length match) 1)
+
              (let ((z (map (lambda (x)
                               (if (string-ci=? (stringify x) match)
                                   (string->list replacement)
                                   x))
                            ll)))
-                (list->string (flatten z)))
-             z))))
+                (list->string (flatten z))))))
+
 
 (define (flatten list)
    (cond ((null? list) '())

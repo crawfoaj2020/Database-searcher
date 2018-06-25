@@ -20,11 +20,12 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(http:include "components.ss")
-(include "c:/Users/AJCRAWFORD/Documents/searchLotsDirs/web/swish/runningQuery.ss")
+
+(http:include "displayQuery.ss")
+(import (helpers))
 
 (define (get-page-name)
-  (let ([table (string-param "table")])
+  (let ([table (string-param "table" params)])
     (if table
         (string-append "Searching table: " (stringify table))
         "Search")))
@@ -41,6 +42,8 @@
      
      [,_
       (section "Query failed" `(p ,(exit-reason->english reason)))])))
+
+
 
 
 
@@ -184,7 +187,6 @@
            (execute-sql db
              "select tbl_name from SQLITE_MASTER where type in (?, ?) order by tbl_name" "table" "view"))])
     (respond
-     
      (section "Please enter the following fields"
      `(form (@ (method "get") (class "schema")) (table
              (tr (@ (style "text-align:center;"))
@@ -230,15 +232,15 @@ select.addEventListener('change', updateColumnOrder, false);")
 
 ;;Runs each time something changes, calls intial-setup or do-query
 (define (dispatch)
-  (let ([keyword (string-param "keyWord")]
-        [table (string-param "table")]
-        [min (string-param "min")]
-        [max (string-param "max")]
+  (let ([keyword (string-param "keyWord" params)]
+        [table (string-param "table" params)]
+        [min (string-param "min" params)]
+        [max (string-param "max" params)]
         [desc (find-param "desc")]
-        [limit (integer-param "limit" 0)]
-        [offset (integer-param "offset" 0)]
-        [sql (string-param "sql")]
-        [order-col (string-param "order")])
+        [limit (integer-param "limit" 0 params)]
+        [offset (integer-param "offset" 0 params)]
+        [sql (string-param "sql" params)]
+        [order-col (string-param "order" params)])
     (with-db [db (log-path) SQLITE_OPEN_READONLY]
       (cond
        [(previous-sql-valid? sql) (do-query db sql limit offset ""  (lambda x x))]

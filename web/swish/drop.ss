@@ -21,7 +21,7 @@
 ;;; DEALINGS IN THE SOFTWARE.
 
 (http:include "components.ss")
-(include "c:/Users/AJCRAWFORD/Documents/searchLotsDirs/web/swish/runningQuery.ss")
+(import (helpers))
 
 (define-syntax respond2
   (syntax-rules ()
@@ -36,9 +36,9 @@
        c1 c2 ...)]))
 
 (define (drop-test)
-  (let ([test (string-param "Test")])
+  (let ([test (string-param "Test" params)])
     (if test
-        (let ([other (string-param "abc")])
+        (let ([other (string-param "abc" params)])
           (respond2 `(p ,other)))
         (respond2
          
@@ -86,7 +86,11 @@ var select = document.getElementById('drop');
          (td (p "also short"))
          (td (p "Much longer text AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbcd")))))))
 
+(define (basic-test)
+  (respond2
+   ( `(p "hi") `(p "bye"))))
+
 
 ;(table-test)
 (drop-test)
-
+;(basic-test)

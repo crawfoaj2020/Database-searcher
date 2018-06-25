@@ -20,9 +20,9 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(http:include "components.ss")
-(include "c:/Users/AJCRAWFORD/Documents/searchLotsDirs/web/swish/runningQuery.ss")
-
+;(http:include "components.ss")
+(http:include "displayQuery.ss")
+(import (helpers))
 
 ;; HTTP/HTML responses
 
@@ -98,10 +98,10 @@
 ;; Dispatching requests
 
 (define (dispatch)
-  (let ([sql (string-param "sql")]
-        [last-sql (string-param "lastSql")]
-        [limit (integer-param "limit" 0)]
-        [offset (integer-param "offset" 0)])
+  (let ([sql (string-param "sql" params)]
+        [last-sql (string-param "lastSql" params)]
+        [limit (integer-param "limit" 0 params)]
+        [offset (integer-param "offset" 0 params)])
     (with-db [db (log-path) SQLITE_OPEN_READONLY]
       (if sql
           (match (catch (check-run-query db sql limit offset))

@@ -20,8 +20,8 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(http:include "components.ss")
 (import (helpers))
+(http:include "components.ss")
 
 (define (uptime)
   (let* ([x (real-time)]
@@ -38,7 +38,7 @@
       days hours minutes seconds)))
 
 ;; HTML responses
-(define-syntax respond
+(define-syntax respond1
   (syntax-rules ()
     [(_ c1 c2 ...)
       (hosted-page (format "~a ~a" software-product-name software-version)
@@ -48,7 +48,7 @@
         c1 c2 ...)]))
 
 (define (do-home)
-  (respond
+  (respond1
    (section "Summary"
    `(p "Snapshot from " ,(date-and-time))
    `(p "Uptime: " ,(uptime))
@@ -66,14 +66,14 @@
          ;(script "document.getElementById('pathVal').value = 'Work';"))))) 
 
 (define (update-path)
-  (let ((path (string-param "path-val"))) 
+  (let ((path (string-param "path-val" params))) 
   ;(log-path path)
-  (respond
+  (respond1
    `(p "Path updated. New path:")
    `(p ,path) `(script "location.reload(); document.getElementById('path').value = #f;"))))
 
 (define (dispatch)
-  (let ([path (string-param "path")])
+  (let ([path (string-param "path" params)])
     (if path
         (update-path)
         (do-home))))

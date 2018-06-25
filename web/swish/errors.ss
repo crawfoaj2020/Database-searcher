@@ -20,8 +20,8 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(http:include "components.ss")
-(include "c:/Users/AJCRAWFORD/Documents/searchLotsDirs/web/swish/runningQuery.ss")
+(http:include "displayQuery.ss")
+(import (helpers))
 
 (define (get-page-name)
   (match (get-param "type")
@@ -31,7 +31,7 @@
             [,_ (raise `#(invalid-type))]))
 
 (define (respond:error reason)
-  (respond
+  (respond params op (get-page-name)
    (match reason
      [#(invalid-type) (section "Fail" `(p "Invalid type"))]
      [,_ (section "Critical error" `(p ,(exit-reason->english reason)))])))
@@ -66,12 +66,12 @@
     `(p ""))
 
 (define (dispatch)
-  (let ([limit (integer-param "limit" 0)]
-        [offset (integer-param "offset" 0)]
+  (let ([limit (integer-param "limit" 0 params)]
+        [offset (integer-param "offset" 0 params)]
         [child-sql "SELECT id, name, supervisor, restart_type, type, shutdown, datetime(start/1000,'unixepoch','localtime') as start, duration, killed, reason, NULL as stack FROM child WHERE reason IS NOT NULL AND reason NOT IN ('normal', 'shutdown') ORDER BY id DESC"]
         [gen-sql "SELECT datetime(timestamp/1000,'unixepoch','localtime') as timestamp, name, last_message, state, reason, NULL as stack  FROM gen_server_terminating ORDER BY ROWID DESC"]
         [super-sql "SELECT datetime(timestamp/1000,'unixepoch','localtime') as timestamp, supervisor, error_context, reason, child_pid, child_name, NULL as stack FROM supervisor_error ORDER BY ROWID DESC"]
-        [sql (string-param "sql")]
+        [sql (string-param "sql" params)]
         [child-func  (lambda (id name supervisor restart-type type shutdown start duration killed reason _stack)
                        (let-values ([(reason stack) (get-reason-and-stack reason)])
                          (list id name supervisor restart-type type shutdown start (nice-duration duration)
