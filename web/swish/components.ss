@@ -86,13 +86,11 @@
   (panel (osi_get_hostname)
     (section software-product-name
       (link "index" "Home")
-      (link "charts" "Charts")
       (link "errors?type=child&sql=&limit=100&offset=0" "Child Errors")
-      (link "errors?type=gen-server&sql=&limit=100&offset=0" "Gen-Server Errors")
-      (link "errors?type=supervisor&sql=&limit=100&offset=0" "Supervisor Errors")
+      (link "saved?type=database&sql=&limit=100&offset=0" "Manage databases")
+      (link "saved?type=search&sql=&limit=100&offset=0" "Saved searches")
       (link "search" "Search")
-      (link "query-db" "SQLite Query")
-      (link "drop" "Drop-down")
+      (link "query-db" "Advanced search")
       (link "debug" "Debug"))))
 
 (define (stilts height)

@@ -31,7 +31,7 @@
             [,_ (raise `#(invalid-type))]))
 
 (define (respond:error reason)
-  (respond params op (get-page-name)
+  (respond
    (match reason
      [#(invalid-type) (section "Fail" `(p "Invalid type"))]
      [,_ (section "Critical error" `(p ,(exit-reason->english reason)))])))
@@ -63,14 +63,14 @@
     [,_ ""]))
 
 (define (home-link last-sql)
-    `(p ""))
+    (void))
 
 (define (dispatch)
   (let ([limit (integer-param "limit" 0 params)]
         [offset (integer-param "offset" 0 params)]
-        [child-sql "SELECT id, name, supervisor, restart_type, type, shutdown, datetime(start/1000,'unixepoch','localtime') as start, duration, killed, reason, NULL as stack FROM child WHERE reason IS NOT NULL AND reason NOT IN ('normal', 'shutdown') ORDER BY id DESC"]
-        [gen-sql "SELECT datetime(timestamp/1000,'unixepoch','localtime') as timestamp, name, last_message, state, reason, NULL as stack  FROM gen_server_terminating ORDER BY ROWID DESC"]
-        [super-sql "SELECT datetime(timestamp/1000,'unixepoch','localtime') as timestamp, supervisor, error_context, reason, child_pid, child_name, NULL as stack FROM supervisor_error ORDER BY ROWID DESC"]
+        [child-sql "SELECT id, name, supervisor, restart_type, type, shutdown, datetime(start/1000,'unixepoch','localtime') as start, duration, killed, reason, null as stack FROM child WHERE reason IS NOT NULL AND reason NOT IN ('normal', 'shutdown') ORDER BY id DESC"]
+        [gen-sql "SELECT datetime(timestamp/1000,'unixepoch','localtime') as timestamp, name, last_message, state, reason, null as stack  FROM gen_server_terminating ORDER BY ROWID DESC"]
+        [super-sql "SELECT datetime(timestamp/1000,'unixepoch','localtime') as timestamp, supervisor, error_context, reason, child_pid, child_name, null as stack FROM supervisor_error ORDER BY ROWID DESC"]
         [sql (string-param "sql" params)]
         [child-func  (lambda (id name supervisor restart-type type shutdown start duration killed reason _stack)
                        (let-values ([(reason stack) (get-reason-and-stack reason)])

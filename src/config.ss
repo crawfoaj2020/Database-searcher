@@ -19,5 +19,7 @@
       [,version (raise `#(unsupported-db-version ,schema-name ,version))]))    
 
   (define (create-db)
-    (void))
+    (execute "create table if not exists databases (name text, description text, [file Path] text)")
+    (execute "create table if not exists searches (name text, description text, sqlite text)")
+    )
   )

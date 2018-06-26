@@ -20,39 +20,29 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(import (helpers))
 (http:include "components.ss")
-
-(define (uptime)
-  (let* ([x (real-time)]
-         [milliseconds (remainder x 1000)]
-         [x (quotient x 1000)]
-         [seconds (remainder x 60)]
-         [x (quotient x 60)]
-         [minutes (remainder x 60)]
-         [x (quotient x 60)]
-         [hours (remainder x 24)]
-         [x (quotient x 24)]
-         [days x])
-    (format "~a day~:p, ~a hour~:p, ~a minute~:p, ~a second~:p"
-      days hours minutes seconds)))
+(import (helpers))
 
 ;; HTML responses
-(define-syntax respond1
+(define-syntax respond
   (syntax-rules ()
     [(_ c1 c2 ...)
-      (hosted-page (format "~a ~a" software-product-name software-version)
+      (hosted-page "Confirm delete" 
         '()
         c1 c2 ...)]))
 
-(define (do-home)
-  (respond1
-   (section "Summary"
-   `(p "Snapshot from " ,(date-and-time))
-   `(p "Uptime: " ,(uptime))
-     `(p "These pages are designed for a 1680 by 1050 resolution using Firefox, Opera, Chrome, or Safari."))))
+(define (database-confirm)
+  (respond `(p "Are you sure you wish to delete this database?")
+    `(p "The database will not be removed from memory, just from this application")
+    (link "saved?type=database&sql=&limit=100&offset=0" "Cancel")))
 
-(do-home)
-   
+(define (search-confirm)
+  (respond `(p "Are you sure you want to remove this search?")
+    (link "saved?type=search&sql=&limit=100&offset=0" "Cancel")))
 
-   
+(define (dispatch)
+  (match (get-param "type")
+    ["database" (database-confirm)]
+    ["search" (search-confirm)]))
+
+(dispatch)

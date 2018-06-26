@@ -89,9 +89,7 @@
   (do-query db sql limit offset "" (lambda x x)))
 
 (define (home-link last-sql)
-    `(a (@ (href ,(format "query-db?lastSql=~a"
-                    (http:percent-encode last-sql))))
-       "Return to query page"))
+  (link (format "saveSearch?sql=~a" last-sql) "Save search"))
 
 
 

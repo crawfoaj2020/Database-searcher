@@ -226,8 +226,7 @@ select.addEventListener('change', updateColumnOrder, false);")
       (schema->html db-tables)))))
 
 (define (home-link last-sql)
-    `(a (@ (href "search"))
-       "Return to search page"))
+  (link (format "saveSearch?sql=~a" last-sql) "Save search"))
 
 
 ;;Runs each time something changes, calls intial-setup or do-query
@@ -243,9 +242,9 @@ select.addEventListener('change', updateColumnOrder, false);")
         [order-col (string-param "order" params)])
     (with-db [db (log-path) SQLITE_OPEN_READONLY]
       (cond
-       [(previous-sql-valid? sql) (do-query db sql limit offset ""  (lambda x x))]
+       [(previous-sql-valid? sql) (do-query db sql limit offset "" (lambda x x))]
         [table
-         (let ([column (string-param "column")])
+         (let ([column (string-param "column" params)])
            (match (catch (construct-sql table column keyword min max desc db order-col))
              [#(EXIT ,reason) (respond:error reason)]
              [,value (do-query db value limit offset "" (lambda x x))]))]

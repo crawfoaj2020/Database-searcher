@@ -63,7 +63,7 @@
     [,results (get-results (lambda () (sqlite:step stmt)) row->tr)]
     [,count (length results)])
    (if (= count 0)
-       (respond  (section "Query finished")) ;`(p ,(home-link sql))))
+       (respond  (section "Query finished" `(p ,(home-link sql))))
        (respond
         `(table
           (tr (@ (style "text-align: center;"))
@@ -77,16 +77,19 @@
                 (button (@ (id "offsetButton") (type "submit")) "Go to row")
                 (p (input (@ (id "offsetInput") (name "offset") (class "offset"))))))
             (td (@ (class "navigation"))
-              ,(nav-form "Next Page" (+ offset limit) (= count limit)))))
-            ;(td (@ (class "link"))
-             ; ,(home-link sql))))
+              ,(nav-form "Next Page" (+ offset limit) (= count limit)))
+            (td (@ (class "link"))
+              ,(home-link sql))))
         (section (format "Rows ~d to ~d" (+ offset 1) (+ offset count))
           (match (cons (sqlite:columns stmt) (sqlite:execute stmt '()))
             [(,cols . ,rows) (data->html-table 1 cols rows f)]))))))
 
 (define (make-td c r)
   (let* ([text (format "~a" r)]
-        [len (string-length text)])
+         [len (string-length text)]
+         [text (if (starts-with-ci? text "(a (")
+                   r
+                   text)])
     (cond
      [(< len 64)
       `(td (@ (class "narrow")) ,text)]
@@ -106,7 +109,7 @@
            [min (round (/ (/ 100 num-cols) 2))]
            [max (round (* (/ 100 num-cols) 2))])
       `(@ (max-width ,max) (min-width ,min) )))
-     ; `(p ,min "%"))) 
+
            
   (let ([columns (vector->list columns)])
     `(div (@ (class "dataCont"))
