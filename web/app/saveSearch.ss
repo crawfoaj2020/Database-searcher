@@ -31,6 +31,11 @@
         (list (css-include "css/saveSearch.css"))
         c1 c2 ...)]))
 
+(define (respond:error reason)
+  (respond
+   (match reason
+     [,_ (section "insert failed" `(p ,(exit-reason->english reason)))])))
+
 (define (intial-setup)
   (let ([sql (get-param "sql")])
   (respond `(form
@@ -42,17 +47,11 @@
     (input (@ (id "sql") (name "sql") (class "hidden") (value ,sql)))))))
 
 (define (save-query name desc sql)
-  ;; (with-db [db (log-path) SQLITE_OPEN_READWRITE] 
-  ;; (let* ([stmt (sqlite:prepare db "insert into searches (name, description, sqlite) values (?, ?, ?)")]
-  ;;        [boundStm (sqlite:bind stmt (list name desc sql))])
-  ;;   (sqlite:execute "insert into searches (name, description, sqlite) values ('test', 'ab', 'lastVal')" '())
-  (define (execute-insert)
-    (sqlite:step "insert into searches (name, description, sqlite) values ('OBVIOUS', 'ab', 'lastVal')"))
-  ;; (match (catch (execute-insert))
-  ;;   [#(EXIT ,reason) (respond `(p ,reason))]
-  ;;   [,_
-    
-    (respond `(p "Save not yet implemented")))
+   (match (db:transaction 'log-db (lambda () (execute  (format "insert into searches (name, description, sqlite)
+values ('~a', '~a', '~a')" name desc sql))))
+    [#(ok ,_) (respond `(p "Save successful"))]
+    [,error (respond:error error)]))
+
        
 
 (define (dispatch)

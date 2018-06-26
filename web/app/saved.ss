@@ -43,8 +43,8 @@
 (define (dispatch)
   (let ([limit (integer-param "limit" 0 params)]
         [offset (integer-param "offset" 0 params)]
-        [search-sql "Select name, description, sqlite, null as [delete] from searches"]
-        [data-sql "Select name, description, [file path], null as [delete] from databases"]
+        [search-sql "Select name, description, sqlite, null as [delete] from searches order by name"]
+        [data-sql "Select name, description, [file path], null as [delete] from databases order by name"]
         [type (get-param "type")]
         [sql (string-param "sql" params)]
         [search-func (lambda (name desc sqlite delete)

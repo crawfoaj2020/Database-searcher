@@ -42,11 +42,17 @@
     
 
 (define (delete-and-show-confirmation value type)
- ; (with-db [db (log-path) SQLITE_OPEN_READWRITE]
-  ;  (sqlite:execute "delete from databases where [file Path] = 'select* from version')" '()))
-  (respond `(p "Here, not working")
-    `(input (@ (id "val") (name "val") (class "hidden") (value ,value)))
-    `(input (@ (id "type") (name "type") (class "hidden") (value ,type)))))
+  (let ([database-name (match type
+                         ["database" "databases"]
+                         ["search" "searches"])]
+        [column (match type
+                  ["database" "[file Path]"]
+                  ["search" "sqlite"])])
+    
+  (match (db:transaction 'log-db (lambda () (execute  (format "delete from ~a where ~a = '~a'" database-name column value))))
+    [#(ok ,_) (respond `(p "Delete successful"))]
+    [,error (respond `(p ,error))])))
+
 
 (define (dispatch)
   (let ([delete-clicked (string-param "click" params)]
