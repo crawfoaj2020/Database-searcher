@@ -91,7 +91,7 @@
       (link "saved?type=search&sql=&limit=100&offset=0" "Saved searches")
       (link "search" "Search")
       (link "query-db" "Advanced search")
-      (link "debug" "Debug"))))
+      (link "Debug" "Debug"))))
 
 (define (stilts height)
   `(div (@ (style ,(format "height:~apx;" height)) (class "stilts"))))

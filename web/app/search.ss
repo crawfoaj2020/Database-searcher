@@ -240,15 +240,17 @@ select.addEventListener('change', updateColumnOrder, false);")
         [offset (integer-param "offset" 0 params)]
         [sql (string-param "sql" params)]
         [order-col (string-param "order" params)])
-    (with-db [db (log-path) SQLITE_OPEN_READONLY]
+    (unless (user-log-path)
+      (respond `(p "Please select a database first")))
+    (with-db [db (user-log-path) SQLITE_OPEN_READONLY]
       (cond
        [(previous-sql-valid? sql) (do-query db sql limit offset "" (lambda x x))]
-        [table
-         (let ([column (string-param "column" params)])
-           (match (catch (construct-sql table column keyword min max desc db order-col))
-             [#(EXIT ,reason) (respond:error reason)]
-             [,value (do-query db value limit offset "" (lambda x x))]))]
-        [else (intial-setup db)]))))
+       [table
+        (let ([column (string-param "column" params)])
+          (match (catch (construct-sql table column keyword min max desc db order-col))
+            [#(EXIT ,reason) (respond:error reason)]
+            [,value (do-query db value limit offset "" (lambda x x))]))]
+       [else (intial-setup db)]))))
     
     
 

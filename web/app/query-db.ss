@@ -20,7 +20,6 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-;(http:include "components.ss")
 (http:include "displayQuery.ss")
 (import (helpers))
 
@@ -100,7 +99,9 @@
         [last-sql (string-param "lastSql" params)]
         [limit (integer-param "limit" 0 params)]
         [offset (integer-param "offset" 0 params)])
-    (with-db [db (log-path) SQLITE_OPEN_READONLY]
+    (unless (user-log-path)
+      (respond `(p "Please select a database first")))
+    (with-db [db (user-log-path) SQLITE_OPEN_READONLY]
       (if sql
           (match (catch (check-run-query db sql limit offset))
             [#(EXIT ,reason) (respond:error reason sql)]

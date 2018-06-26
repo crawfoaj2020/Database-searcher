@@ -20,64 +20,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
+td.nav {
+  padding: 10px;
+  vertical-align: top;
+  border: 0px solid;
+}
+
 .hidden { display: none; }
-
-.schema { width: 500px; }
-
-[disabled] { color:graytext; }
-
-form { display: inline; }
-
-input.offset { width: 4em; }
-
-td.link {
-  padding: 3px 1px 1px 5px;
-  vertical-align: top;
-  border: 0px solid;
-}
-
-td.navigation {
-  padding: 1px;
-  vertical-align: top;
-  border: 0px solid;
-}
-
-textarea.sql {
-  height: 10em;
-  width: 40em;
-}
-
-.dataTable {
-    word-wrap: break-word;
-}
-
-.dataTable th{
-    text-align: left;
-}
-
-.narrow{
-    max-width: 150px;
-    min-width: 0px;
-}
-
-.normal{
-    max-width: 200px;
-    min-width: 0px;
-}
-
-.wide{
-    max-width: 250px;
-    min-width: 0px;
-}
-
-.extra-wide{
-    max-width: 350px;
-    min-width: 0px;
-}
-
-
-.dataCont {
-    overflow-x: auto;
-    width: 100%;
-}
-

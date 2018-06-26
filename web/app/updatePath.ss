@@ -27,22 +27,13 @@
 (define-syntax respond
   (syntax-rules ()
     [(_ c1 c2 ...)
-      (hosted-page "Confirm delete" 
-        '()
+      (hosted-page "Database changed" 
+       '()
         c1 c2 ...)]))
 
-(define (database-confirm)
-  (respond `(p "Are you sure you wish to delete this database?")
-    `(p "The database will not be removed from memory, just from this application")
-    (link "saved?type=database&sql=&limit=100&offset=0" "Cancel")))
-
-(define (search-confirm)
-  (respond `(p "Are you sure you want to remove this search?")
-    (link "saved?type=search&sql=&limit=100&offset=0" "Cancel")))
-
 (define (dispatch)
-  (match (get-param "type")
-    ["database" (database-confirm)]
-    ["search" (search-confirm)]))
+  (let ([val (string-param "val" params)])
+    (user-log-path val)
+    (respond `(p "Active database was changed to") `(p ,val))))
 
 (dispatch)

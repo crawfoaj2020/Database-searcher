@@ -50,9 +50,11 @@
         [search-func (lambda (name desc sqlite delete)
                        (list name desc
                          (link (format "query-db?limit=100&offset=0&sql=~a" sqlite) (format "~a" sqlite))
-                         (link "confirm-delete?type=search" "Delete")))]
+                         (link (format "confirm-delete?type=search&val=~a" sqlite)  "Delete")))]
         [data-func (lambda (name desc filePath delete)
-                         (list name desc filePath (link "confirm-delete?type=database" "Delete")))]) 
+                     (list name desc
+                       (link (format "updatePath?val=~a" filePath) (format "~a" filePath))
+                       (link (format "confirm-delete?type=database&val=~a" filePath) "Delete")))]) 
     
    (let ([sql (if (previous-sql-valid? sql)
                    sql
