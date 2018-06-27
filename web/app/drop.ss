@@ -41,9 +41,9 @@
         (let ([other (string-param "abc" params)])
           (respond2 `(p ,other)))
         (respond2
-         
+          `(input (@ (id "abba")))
           
-          `(script "document.getElementById('abc').value = 'Success (not at spelling success)'")
+          `(script "document.getElementById('abba').value = 'Success (not at spelling success)'")
           `(form (@ (method "get"))
              (select (@ (name "Test") (id "drop"))
                (option "a")
@@ -66,7 +66,7 @@
                   (option "6"))))
                (p (button (@ (type "submit")) "Go")))
              (input (@ (id "abcd") (name "abcd") (value "my val")))
-             `(input (@ (id "abc") (name "abc")))
+            
              (script "$('div.container').children().hide();
 var select = document.getElementById('drop');
 ;select.addEventListener('change', updateFeild, false);"
@@ -88,9 +88,25 @@ var select = document.getElementById('drop');
 
 (define (basic-test)
   (respond2
-   ( `(p "hi") `(p "bye"))))
+   `(input (@ (id "testNot")))
+   `(script "document.getElementById('testNot').value = 'WORK'")
+   `(input (@ (name "path") (class "path") (type "file") (id "path")))
+   `(script "function func(){var x = document.getElementById('path').value;
+document.getElementById('testNot').value = x} $('.path').bind('change', func).trigger('change')")))
+
+;; (define (img-test)
+;;   (respond2 `(script "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+;;     `(script "$('#imgInp').change(function() {
+;;   readURL(this);
+;; });")
+;;     `(form (@ (id "form1") (runat "server"))
+;;        (input (@ (type "file") (id "imgInp")))
+;;        (img (@ (id "blah") (src "#") (alt "your image"))))))
+  
+
 
 
 ;(table-test)
-(drop-test)
-;(basic-test)
+;(drop-test)
+(basic-test)
+;(img-test)

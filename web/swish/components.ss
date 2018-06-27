@@ -57,7 +57,10 @@
         ,(docked-navigation)
         ,(column "content right"
            (apply panel page-title content))
-        )))))
+        (div (@ (class "undocked menu"))
+          ,(link "#Debugging" "Debugging")
+          (div (@ (class "menu item"))
+            ,(panel "Params" `(p ,(format "~a\n" params))))))))))
 
 ;;HTML Helpers
 (define (link url anchor)
@@ -76,33 +79,19 @@
 
 ;;Page Helpers
 
-(define (active-database)
-  `(div (p " ")
-    (p "Current Database:")
-     (p ,(get-database-name))))
-
-(define (get-database-name)
-  (with-db [db (log-path) SQLITE_OPEN_READONLY]
-    (let* ([stmt (sqlite:prepare db (format "select name from databases where file_path = '~a'" (user-log-path)))]
-           [results (sqlite:step stmt)])
-      (if results
-          `(p ,(format "~a" (car (vector->list results))))
-          `(p "None selected")))))
-
 (define (docked-navigation)
   (column-with-id "main-nav" "docked menu left" (navigation)))
 
 (define (navigation)
   (panel (osi_get_hostname)
     (section software-product-name
-      (link "index" "Home")
-      (link "saved?type=database&sql=&limit=100&offset=0" "Manage databases")
-      (link "saved?type=search&sql=&limit=100&offset=0" "Saved searches")
-      (link "search" "Search")
-      (link "query-db" "Advanced search")
-      (link "/swish/errors?type=child" "Debug")
-     ; (link "drop" "test")
-    (active-database))))
+      (link "../app/index" "Back to search")
+      (link "charts" "Charts")
+      (link "errors?type=child" "Child Errors")
+      (link "errors?type=gen-server" "Gen-Server Errors")
+      (link "errors?type=supervisor" "Supervisor Errors")
+      (link "query-db" "Log DB")
+      (link "debug" "Debug"))))
 
 (define (stilts height)
   `(div (@ (style ,(format "height:~apx;" height)) (class "stilts"))))

@@ -46,7 +46,7 @@
                          ["database" "databases"]
                          ["search" "searches"])]
         [column (match type
-                  ["database" "[file Path]"]
+                  ["database" "file_path"]
                   ["search" "sqlite"])])
     
   (match (db:transaction 'log-db (lambda () (execute  (format "delete from ~a where ~a = '~a'" database-name column value))))

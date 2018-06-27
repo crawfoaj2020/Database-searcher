@@ -25,6 +25,7 @@
   (export
    string-param
    integer-param
+   string-param-sql
    previous-sql-valid?
    stringify
    trim-whitespace
@@ -40,6 +41,12 @@
 (define (string-param name params)
     (let ([value (http:find-param name params)])
       (and value (trim-whitespace value))))
+
+(define (string-param-sql name params)
+  (let ([val (string-param name params)])
+    (if val
+        (string-replace val "'" "''")
+        val)))
 
 (define (integer-param name min-value params)
     (let* ([string-value (http:find-param name params)]

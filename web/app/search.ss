@@ -77,18 +77,15 @@
                          "ASC")])
       (string-append "ORDER by " order-col " "  desc-or-asc)))
   (define (build-search-str)
-    (let ((double-quoted (string-replace search-term "'" "''")))
       (if (string=? search-column "")
         #f
-        (string-append search-column " like  " "('" double-quoted "')"))))
+        (string-append search-column " like  " "('" search-term "')")))
 
   (define (build-time-range)
-    (let ((range-min (string-replace range-min "'" "''"))
-          (rande-max (string-replace range-max "'" "''")))
     (if (string=? range-min "")
         #f
         (string-append "datetime(timestamp/1000,'unixepoch','localtime')"
-          "between ('" range-min "') and ('" range-max "')"))))
+          "between ('" range-min "') and ('" range-max "')")))
 
   (check-request-blank-vals)
   (let* ([all-cols (get-columns search-table db)]
@@ -231,10 +228,10 @@ select.addEventListener('change', updateColumnOrder, false);")
 
 ;;Runs each time something changes, calls intial-setup or do-query
 (define (dispatch)
-  (let ([keyword (string-param "keyWord" params)]
+  (let ([keyword (string-param-sql "keyWord" params)]
         [table (string-param "table" params)]
-        [min (string-param "min" params)]
-        [max (string-param "max" params)]
+        [min (string-param-sql "min" params)]
+        [max (string-param-sql "max" params)]
         [desc (find-param "desc")]
         [limit (integer-param "limit" 0 params)]
         [offset (integer-param "offset" 0 params)]

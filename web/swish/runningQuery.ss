@@ -20,16 +20,14 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(http:include "components.ss")
-(import (helpers))
 
 ;; HTML responses
 (define-syntax respond
   (syntax-rules ()
     [(_ c1 c2 ...)
-      (hosted-page (get-page-name) 
+      (hosted-page (get-page-name)
         (list (css-include "css/query-db.css")
-          (js-include "js/jquery-1.4.4.min.js")
+          (js-include "js/jquery-1.4.4.min.js") ;Enforces data entry constraints
           (js-include "js/query-db.js"))
         c1 c2 ...)]))
 
@@ -63,8 +61,9 @@
     [,results (get-results (lambda () (sqlite:step stmt)) row->tr)]
     [,count (length results)])
    (if (= count 0)
-       (respond  (section "Query finished" `(p ,(home-link sql))))
+       (respond (section "Query finished" `(p ,(home-link sql))))
        (respond
+        
         `(table
           (tr (@ (style "text-align: center;"))
             (td (@ (class "navigation"))
@@ -86,10 +85,7 @@
 
 (define (make-td c r)
   (let* ([text (format "~a" r)]
-         [len (string-length text)]
-         [text (if (starts-with-ci? text "(a (")
-                   r
-                   text)])
+        [len (string-length text)])
     (cond
      [(< len 64)
       `(td (@ (class "narrow")) ,text)]
@@ -109,7 +105,7 @@
            [min (round (/ (/ 100 num-cols) 2))]
            [max (round (* (/ 100 num-cols) 2))])
       `(@ (max-width ,max) (min-width ,min) )))
-
+     ; `(p ,min "%"))) 
            
   (let ([columns (vector->list columns)])
     `(div (@ (class "dataCont"))
@@ -121,7 +117,18 @@
             `(tr ,@(map make-td columns (apply f (vector->list row)))))
           rows))))))
 
+;;Common helpers
+(define (string-param name)
+    (let ([value (find-param name)])
+      (and value (trim-whitespace value))))
 
+(define (integer-param name min-value)
+    (let* ([string-value (find-param name)]
+           [number-value (and string-value (string->number string-value))])
+      (and string-value
+           (if (and (integer? number-value) (>= number-value min-value))
+               number-value
+               (raise `#(bad-integer-param ,name ,min-value ,number-value))))))
 
 (define (schema->html db-tables)
   (define (db-table->tr table)
@@ -132,8 +139,66 @@
   (define (column->tr column-type)
     (match column-type
       [(,column . ,type)
-       `(tr (td ,(stringify column)) 
+       `(tr (td ,(stringify column))
           (td ,type))]))
   `(div (@ (class "schema"))
      ,@(map db-table->tr db-tables)))
+
+(define (previous-sql-valid? sql)
+   (and sql (not (string=? sql ""))))
+
+;; String manipulation
+(define (stringify x) (format "~a" x))
+
+(define (trim-whitespace s)
+  (define (find-start s i len)
+    (cond
+     [(eqv? i len) ""]
+     [(char-whitespace? (string-ref s i)) (find-start s (fx+ i 1) len)]
+     [else (find-end s (fx- len 1) i len)]))
+  (define (find-end s i start len)
+    (cond
+     [(eqv? i start)
+      (if (eqv? len 1)
+          s
+          (string (string-ref s i)))]
+     [(char-whitespace? (string-ref s i)) (find-end s (fx- i 1) start len)]
+     [else
+      (if (and (eqv? start 0) (eqv? (fx- len 1) i))
+          s
+          (substring s start (fx+ i 1)))]))
+  (find-start s 0 (string-length s)))
+
+(define (containsStr? list x)
+    (cond 
+        ((null? list) #f)
+        ((string-ci=? (car list) x) #t)
+        (else (containsStr? (cdr list) x))))
+
+(define (slist->string slst div)
+  (cond ((null? slst) "")
+        ((null? (cdr slst)) (car slst))
+    (else (string-append (car slst)
+            div
+            (slist->string (cdr slst) div)))))
+
+(define string-replace 
+   (lambda (s match replacement)
+      (let ((ll (string->list s)))
+         (if (= (string-length match) 1)
+             (let ((z (map (lambda (x)
+                              (if (string-ci=? (stringify x) match)
+                                  (string->list replacement)
+                                  x))
+                           ll)))
+                (list->string (flatten z)))
+             z))))
+
+(define (flatten list)
+   (cond ((null? list) '())
+         ((list? (car list)) (append (flatten (car list)) (flatten (cdr list))))
+         (else
+          (cons (car list) (flatten (cdr list))))))
+
+
 

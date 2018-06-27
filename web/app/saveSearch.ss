@@ -55,9 +55,9 @@ values ('~a', '~a', '~a')" name desc sql))))
        
 
 (define (dispatch)
-  (let ([name (string-param "name" params)]
-        [desc (string-param "desc" params)]
-        [sql (get-param "sql")])
+  (let ([name (string-param-sql "name" params)]
+        [desc (string-param-sql "desc" params)]
+        [sql (string-param-sql "sql" params)])
     (if name
         (save-query name desc sql)
         (intial-setup))))
