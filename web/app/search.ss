@@ -79,7 +79,7 @@
   (define (build-search-str)
       (if (string=? search-column "")
         #f
-        (string-append search-column " like  " "('" search-term "')")))
+        (string-append "[" search-column  "] like  " "('" search-term "')")))
 
   (define (build-time-range)
     (if (string=? range-min "")
@@ -114,7 +114,8 @@
          [columns (if timestamp?
                       (removeTimestamp all-cols)
                       all-cols)]
-         [ls (cons (slist->string columns ", ") ls)]
+         [formated-columns (format-cols all-cols)]
+         [ls (cons formated-columns ls)]
          [ls (if timestamp?
                  (cons "select datetime(timestamp/1000,'unixepoch','localtime') as timestamp," ls)
                  (cons "select" ls))])
@@ -140,6 +141,11 @@
       [#(,_ ,name ,type ,_ ,_ ,_)
        (string->symbol name)]))
   (table-info table))
+
+(define (format-cols cols)
+  (let* ([string (slist->string cols "], [")]
+         [with-start-and-end (string-append "[" string "]")])
+    with-start-and-end))
 
 
 ;;Intial setup
