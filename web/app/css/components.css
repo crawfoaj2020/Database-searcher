@@ -207,7 +207,6 @@ input.elide {
 }
 
 input.elide:checked + .elide {
-     /* color:blue; */
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;

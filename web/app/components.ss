@@ -95,13 +95,11 @@
 (define (navigation)
   (panel (osi_get_hostname)
     (section software-product-name
-      (link "index" "Home")
       (link "saved?type=database&sql=&limit=100&offset=0" "Manage databases")
       (link "saved?type=search&sql=&limit=100&offset=0" "Saved searches")
       (link "search" "Search")
       (link "query-db" "Advanced search")
-      (link "/swish/errors?type=child" "Debug")
-     ; (link "drop" "test")
+      (link "/swish/errors?type=child&sql=&limit=100&offset=0" "Debug")
     (active-database))))
 
 (define (stilts height)

@@ -1,0 +1,21 @@
+{
+ "name": "pythonelectron",
+ "version": "1.0.0",
+ "description": "Python test",
+ "main": "main.js",
+ "scripts": {
+  "start": "electron ."
+ },
+ "author": "AJC",
+ "license": "ISC",
+ "devDependencies": {
+  "electron": "^2.0.4",
+  "request-promise": "^4.2.2"
+ },
+ "dependencies": {
+  "cross-spawn": "^6.0.5",
+  "request": "^2.87.0",
+  "shelljs": "^0.8.2",
+  "tree-kill": "^1.2.0"
+ }
+}

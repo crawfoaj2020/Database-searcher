@@ -1,2 +1,2 @@
 (http:include "app/components.ss")
-(redirect "/app/index")
+(redirect "/app/saved?type=database&sql=&limit=100&offset=0")
