@@ -91,22 +91,11 @@ var select = document.getElementById('drop');
    `(input (@ (id "testNot")))
    `(script "document.getElementById('testNot').value = 'WORK'")
    `(input (@ (name "path") (class "path") (type "file") (id "path")))
-   `(script "function func(){var x = document.getElementById('path').value;
+   `(script "function func(){var x = document.getElementById('path').files[0].path;
 document.getElementById('testNot').value = x} $('.path').bind('change', func).trigger('change')")))
-
-;; (define (img-test)
-;;   (respond2 `(script "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
-;;     `(script "$('#imgInp').change(function() {
-;;   readURL(this);
-;; });")
-;;     `(form (@ (id "form1") (runat "server"))
-;;        (input (@ (type "file") (id "imgInp")))
-;;        (img (@ (id "blah") (src "#") (alt "your image"))))))
-  
-
 
 
 ;(table-test)
 ;(drop-test)
 (basic-test)
-;(img-test)
+

@@ -70,6 +70,7 @@ function updateColumnSearch(){
   var strUser = e.options[e.selectedIndex].text;
   var elements = $('div.container').children().hide();
   var value = $(this).val();
+  document.getElementById('column').value = "";
   elements.filter('.' + value).show(); 
 }
 

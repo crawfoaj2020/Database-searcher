@@ -42,6 +42,12 @@
     
 
 (define (delete-and-show-confirmation value type)
+  (define (return-to-saved)
+    (let ([redirct-loc (match type
+                     ["database" "/app/saved?type=database&sql=&limit=100&offset=0&flag=Delete+Successful"]
+                     ["search" "/app/saved?type=search&sql=&limit=100&offset=0&flag=Delete+Successful"])])
+       (redirect redirct-loc)))
+  
   (let ([database-name (match type
                          ["database" "databases"]
                          ["search" "searches"])]
@@ -49,8 +55,8 @@
                   ["database" "file_path"]
                   ["search" "sqlite"])])
     
-  (match (db:transaction 'log-db (lambda () (execute  (format "delete from ~a where ~a = '~a'" database-name column value))))
-    [#(ok ,_) (respond `(p "Delete successful"))]
+  (match (db:transaction 'log-db (lambda () (execute  (format "delete from ~a where ~a = '~a'" database-name column (string-replace value "'" "''")))))
+    [#(ok ,_) (return-to-saved)]
     [,error (respond `(p ,error))])))
 
 

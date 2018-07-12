@@ -29,13 +29,14 @@
     [(_ c1 c2 ...)
       (hosted-page "Add a new database"
         (list (css-include "css/saveSearch.css")
-          (js-include "js/addData.js"))
+          (js-include "js/jquery-1.4.4.min.js"))
         c1 c2 ...)]))
 
 (define (respond:error reason)
   (respond
    (match reason
      [#(not-database) (section "insert failed" `(p "Invalid file type") `(p "valid file types are: .db, .db3, .sqlite"))]
+     [#(browser-add) (section "Must use desktop app to add databases")]
      [,_ (section "insert failed" `(p ,(exit-reason->english reason)))])))
 
 (define (intial-setup)
@@ -44,27 +45,31 @@
      (tr (th (p "Field")) (th (p "Value")))
      (tr (td (p "Name")) (td (p (textarea (@ (id "name") (name "name") (class "textBox"))))))
      (tr (td (p "Description")) (td (p (textarea (@ (id "desc") (name "desc") (class "desc"))))))
-     (tr (td (p "File")) (td (p (textarea (@ (id "path") (name "path") (class "desc")))))))
-     ;(tr (td (p "File")) (td (input (@ (name "path") (class "pathFeild") (type "file") (id "path"))))))
-    ;(input (@ (id "filePath") (name "filePath") (value "Hi")))
+     (tr (td (p "File")) (td (p (input (@ (name "path") (class "path") (type "file") (id "path")))))))
+    (input (@ (id "file-path") (name "file-path") (class "hidden")))
+    (script "document.getElementById('testNot').value = 'WORK'")
+    (script "function func(){var x = document.getElementById('path').files[0].path;
+document.getElementById('file-path').value = x} $('.path').bind('change', func).trigger('change')")
     (p (button (@ (type "submit")) "Save")))))
 
 
 (define (update-path name desc file)
+  (unless (not (string=? "undefined" file))
+    (raise `#(browser-add)))
   (unless (or (ends-with-ci? file ".db3")
               (ends-with-ci? file ".db")
               (ends-with-ci? file ".sqlite"))
     (raise `#(not-database)))
   (match (db:transaction 'log-db (lambda () (execute (format "insert into databases (name, description, file_path)
 values ('~a', '~a', '~a')" name desc file))))
-    [#(ok ,_) (begin (user-log-path file) (respond `(p "Save successful")))]
+    [#(ok ,_) (begin (user-log-path file) (redirect "saved?type=database&sql=&limit=100&offset=0&flag=Save+successful,+active+database+changed."))]
     [,error (respond:error error)]))
 
 
 (define (dispatch)
   (let ([name (string-param-sql "name" params)]
         [desc (string-param-sql "desc" params)]
-        [file (string-param-sql "path" params)])
+        [file (string-param-sql "file-path" params)])
     (if name
         (match (catch (update-path name desc file))
           [#(EXIT ,reason) (respond:error reason)]

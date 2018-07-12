@@ -57,11 +57,14 @@
            [(bytevector? v) `(i "Binary data")]
            [(not v) "<null>"]
            [else (stringify v)])))
+
   (match-let*
    ([,stmt (sqlite:prepare db (format "~a limit ? offset ?" sql))]
     [,_ (sqlite:bind stmt (list limit  offset))]
     [,results (get-results (lambda () (sqlite:step stmt)) row->tr)]
-    [,count (length results)])
+    [,count (length results)]
+    [,flag (string-param "flag" params)]
+    [,flag (if flag flag "")])
    (if (= count 0)
        (respond  (section "Query finished" `(p ,(home-link sql))))
        (respond
@@ -80,6 +83,7 @@
               ,(nav-form "Next Page" (+ offset limit) (= count limit)))
             (td (@ (class "link"))
               ,(home-link sql))))
+        `(p (@ (style "text-align: center; color: Red; size: +10; font-weight: bold")),flag)
         (section (format "Rows ~d to ~d" (+ offset 1) (+ offset count))
           (match (cons (sqlite:columns stmt) (sqlite:execute stmt '()))
             [(,cols . ,rows) (data->html-table 1 cols rows f)]))))))

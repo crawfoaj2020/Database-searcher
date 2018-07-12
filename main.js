@@ -1,7 +1,11 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow} = require('electron');
+const ipcRenderer = require('electron').ipcRenderer;
 var kill = require('tree-kill');
 var path = require('path')
+const spawn = require('cross-spawn');
+// const child = spawn('./go');
+const child = spawn('./go', {detached: true});
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -9,8 +13,8 @@ let mainWindow
 
 function createWindow () {
   // Create the browser window.
-  const spawn = require('cross-spawn');
-  const child = spawn('./go');
+ 
+  
  // var subpy = require('child_process').spawn('./go');
   mainWindow = new BrowserWindow({show: false,
 				  icon: path.join(__dirname, 'assets/icons/png/64x64.png'),
@@ -42,8 +46,9 @@ app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
-    app.quit()
-    kill(1);
+    app.quit();
+    const child = require('child_process')
+    const killed = child.exec('taskkill /f /im swish.exe');
   }
 })
 

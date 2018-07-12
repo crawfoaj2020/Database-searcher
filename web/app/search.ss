@@ -33,6 +33,7 @@
 (define (respond:error reason)
   (respond
    (match reason
+     [#(no-table) (section "Search failed" `(p "You must select a table"))]
      
      [#(search-term-or-column-empty) (section "Search failed" `(p "If you specify a column, you must specify a search term. Similarly, if you specify a search term you must specify a column"))]
 
@@ -41,7 +42,8 @@
      [#(no-timestamp) (section "Search failed: no timestamp" `(p "Please select a table with that has a column named timestamp in order to search by timestamp"))]
      
      [,_
-      (section "Query failed" `(p ,(exit-reason->english reason)))])))
+      (section "Query failed" `(p ,(exit-reason->english reason)))])
+   (section "" (link "Search" "Go Back"))))
 
 
 
@@ -51,6 +53,8 @@
 (define (construct-sql  search-table search-column search-term range-min range-max desc db order-col)
   (define (check-request-blank-vals)
     (cond
+     [(string=? "(please select a table)" search-table)
+      (raise `#(no-table))]
      [(or (and (not (string=? search-column ""))
                (string=? search-term ""))
           (and (string=? search-column "")
@@ -166,6 +170,7 @@
     (let ((tables (map remove-tags (execute-sql db
                                       "select tbl_name from SQLITE_MASTER where type in (?, ?) order by tbl_name" "table" "view"))))
       `(select (@ (name "table") (id "table"))
+         (option (@ (style "color: grey")) "(please select a table)") ;;Consider: changing to blank option
          ,@(map (lambda (c) `(option ,(stringify c))) tables))))
 
   (define (make-col-drop-downs db-tables cont-name drop-name)

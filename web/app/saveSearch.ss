@@ -49,7 +49,7 @@
 (define (save-query name desc sql)
    (match (db:transaction 'log-db (lambda () (execute  (format "insert into searches (name, description, sqlite)
 values ('~a', '~a', '~a')" name desc sql))))
-    [#(ok ,_) (respond `(p "Save successful"))]
+    [#(ok ,_) (redirect "saved?type=search&sql=&limit=100&offset=0&flag=Save successful")]
     [,error (respond:error error)]))
 
        

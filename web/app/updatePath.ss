@@ -34,6 +34,7 @@
 (define (dispatch)
   (let ([val (string-param "val" params)])
     (user-log-path val)
-    (respond `(p "Active database was changed to") `(p ,val))))
+    (respond `(p "Active database was changed to:") `(p ,(get-database-name))
+      (link "search"  "Go to search page"))))
 
 (dispatch)
