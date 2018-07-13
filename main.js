@@ -7,31 +7,21 @@ const spawn = require('cross-spawn');
 // const child = spawn('./go');
 const child = spawn('./go', {detached: true});
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
 function createWindow () {
   // Create the browser window.
- 
   
- // var subpy = require('child_process').spawn('./go');
   mainWindow = new BrowserWindow({show: false,
 				  icon: path.join(__dirname, 'assets/icons/png/64x64.png'),
 				  backgroundColor: '#4e284c'})
   mainWindow.maximize()
   mainWindow.show()
 
-  // and load the index.html of the app.
   mainWindow.loadURL('http://localhost:54321');
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
     mainWindow = null;
   })
 }
@@ -60,5 +50,3 @@ app.on('activate', function () {
   }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

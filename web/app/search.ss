@@ -85,16 +85,18 @@
         #f
         (string-append "[" search-column  "] like  " "('" search-term "')")))
 
-  (define (build-time-range)
+  (define (build-time-range cols)
     (if (string=? range-min "")
         #f
-        (string-append "datetime(timestamp/1000,'unixepoch','localtime')"
-          "between ('" range-min "') and ('" range-max "')")))
+        (if (containsStr? cols "timestamp")
+            (string-append "strftime('%m/%d/%Y %H:%M:%S', timestamp/1000,'unixepoch','localtime')"
+              "between ('" range-min "') and ('" range-max "')")
+            (string-append "dateTime between ('" range-min "') and ('" range-max"')"))))
 
   (check-request-blank-vals)
   (let* ([all-cols (get-columns search-table db)]
          [ls (cons (build-order all-cols) '())]
-         [time-range (build-time-range)]
+         [time-range (build-time-range all-cols)]
          [ls (if time-range
                  (cons time-range ls)
                  ls)]
@@ -115,16 +117,19 @@
          [timestamp?  (if (containsStr? all-cols "timestamp")
                           #t
                           #f)]
+         [timed? (if (or timestamp? (containsStr? all-cols "dateTime"))
+                          #t
+                          #f)]
          [columns (if timestamp?
                       (removeTimestamp all-cols)
                       all-cols)]
-         [formated-columns (format-cols all-cols)]
+         [formated-columns (format-cols columns)]
          [ls (cons formated-columns ls)]
          [ls (if timestamp?
-                 (cons "select datetime(timestamp/1000,'unixepoch','localtime') as timestamp," ls)
+                 (cons "select strftime('%m/%d/%Y %H:%M:%S', timestamp/1000,'unixepoch','localtime') as timestamp," ls)
                  (cons "select" ls))])
     
-    (if (and time-range (not (containsStr? all-cols "timestamp")))
+    (if (and time-range (not timed?))
         (raise `#(no-timestamp)))
     (slist->string ls " ")))
 
@@ -205,8 +210,8 @@
                                              ,""))) (td (p "% is used for any number of don't care characters")
                                                       (p "#% returns everything that starts with #")))
               (tr (td (p "Minimum date-time")) (td (p (textarea (@ (id "min") (name "min") (class "textBox"))
-                                                        ,""))) (td (p "Inclusive") (p "Format yyyy-mm-dd hh:mm:ss")
-                                                                 (p "For example, 2018-06-06 13:06:07")))
+                                                        ,""))) (td (p "Inclusive") (p "Format mm/dd/yyyy hh:mm:ss")
+                                                                 (p "For example, 07/13/2018 15:38:59")))
               (tr (td (p "Maximum date-time")) (td (p (textarea (@ (id "max") (name "max") (class "textBox"))
                                                         ,""))) (td (p "Inclusive")))
               (tr (td (p "Order by")) (td ,(make-col-drop-downs db-tables "order-contain" "orders")) (td (p "Leave blank for timestamp")))
@@ -250,15 +255,25 @@ select.addEventListener('change', updateColumnOrder, false);")
         [order-col (string-param "order" params)])
     (unless (user-log-path)
       (respond `(p "Please select a database first")))
-    (with-db [db (user-log-path) SQLITE_OPEN_READONLY]
-      (cond
-       [(previous-sql-valid? sql) (do-query db sql limit offset "" (lambda x x))]
-       [table
-        (let ([column (string-param "column" params)])
-          (match (catch (construct-sql table column keyword min max desc db order-col))
-            [#(EXIT ,reason) (respond:error reason)]
-            [,value (do-query db value limit offset "" (lambda x x))]))]
-       [else (intial-setup db)]))))
+
+    ;Start to fixing fact breaks if select deleted database, works for positive case, hangs indeviently for - case
+    ;; (catch #t
+    ;;   (with-db [db (user-log-path) SQLITE_OPEN_READONLY]
+    ;;     (respond `(p "Opened database")))
+    ;;   ((respond `(p "NOPE invalid")))))) 
+      
+
+    
+
+    (match (catch (with-db [db (user-log-path) SQLITE_OPEN_READONLY]
+                    (cond
+                     [(previous-sql-valid? sql) (do-query db sql limit offset "" (lambda x x))]
+                     [table
+                      (let ([column (string-param "column" params)])
+                        (match (catch (construct-sql table column keyword min max desc db order-col))
+                          [#(EXIT ,reason) (respond:error reason)]
+                          [,value (do-query db value limit offset "" (lambda x x))]))]
+                     [else (intial-setup db)]))))))
     
     
 
