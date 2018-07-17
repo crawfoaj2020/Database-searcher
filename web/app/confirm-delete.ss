@@ -45,15 +45,21 @@
   (define (return-to-saved)
     (let ([redirct-loc (match type
                      ["database" "/app/saved?type=database&sql=&limit=100&offset=0&flag=Delete+Successful"]
-                     ["search" "/app/saved?type=search&sql=&limit=100&offset=0&flag=Delete+Successful"])])
+                         ["search" "/app/saved?type=search&sql=&limit=100&offset=0&flag=Delete+Successful"]
+                         ["folder" "saved?type=folder&sql=&limit=100&offset=0&flag=Delete+Successful"]
+                         ["file" "saved?type=fileEdit&sql=&limit=100&offset=0&flag=Delete+Successful"])])
        (redirect redirct-loc)))
   
   (let ([database-name (match type
                          ["database" "databases"]
-                         ["search" "searches"])]
+                         ["search" "searches"]
+                         ["folder" "folder_types"]
+                         ["file" "file_types"])]
         [column (match type
                   ["database" "file_path"]
-                  ["search" "sqlite"])])
+                  ["search" "sqlite"]
+                  ["folder" "name"]
+                  ["file" "[file prefix]"])])
     
   (match (db:transaction 'log-db (lambda () (execute  (format "delete from ~a where ~a = '~a'" database-name column (string-replace value "'" "''")))))
     [#(ok ,_) (return-to-saved)]
@@ -67,12 +73,16 @@
     
     (let ([link
           (match type
-           ["database" (link "saved?type=database&sql=&limit=100&offset=0" "Cancel")]
-            ["search"  (link "saved?type=search&sql=&limit=100&offset=0" "Cancel")])]
+            ["database" (link "saved?type=database&sql=&limit=100&offset=0" "Cancel")]
+            ["search"  (link "saved?type=search&sql=&limit=100&offset=0" "Cancel")]
+            ["folder"  (link "saved?type=folder&sql=&limit=100&offset=0" "Cancel")]
+            ["file"  (link "saved?type=file&sql=&limit=100&offset=0" "Cancel")])]
          [message
           (match type
             ["database" `(p "Are you sure you wish to delete this database? \n The database will not be removed from memory, just from this application")]
-            ["search" `(p "Are you sure you want to remove this search?")])])
+            ["search" `(p "Are you sure you want to remove this search?")]
+            ["folder" `(p "Are you sure you want to remove this folder type?")]
+            ["file" `(p "Are you sure you want to remove this file type?")])])
 
       (if delete-clicked
           (delete-and-show-confirmation value type)

@@ -64,7 +64,8 @@
     [,results (get-results (lambda () (sqlite:step stmt)) row->tr)]
     [,count (length results)]
     [,flag (string-param "flag" params)]
-    [,flag (if flag flag "")])
+    [,flag (if flag flag "")]
+    [,button (string-param "button" params)])
    (if (= count 0)
        (respond  (section "Query finished" `(p ,(home-link sql))))
        (respond
@@ -86,7 +87,9 @@
         `(p (@ (style "text-align: center; color: Red; size: +10; font-weight: bold")),flag)
         (section (format "Rows ~d to ~d" (+ offset 1) (+ offset count))
           (match (cons (sqlite:columns stmt) (sqlite:execute stmt '()))
-            [(,cols . ,rows) (data->html-table 1 cols rows f)]))))))
+            [(,cols . ,rows) (data->html-table 1 cols rows f)]))
+        (if button
+            (link "addFolder?selected=true" "Continue"))))))
 
 (define (make-td c r)
   (let* ([text (format "~a" r)]

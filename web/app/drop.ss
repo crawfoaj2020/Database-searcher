@@ -94,8 +94,24 @@ var select = document.getElementById('drop');
    `(script "function func(){var x = document.getElementById('path').files[0].path;
 document.getElementById('testNot').value = x} $('.path').bind('change', func).trigger('change')")))
 
+(define (run-program)
+  (system "cd ../../Python/ZipProcessor/ZipProcessor/; python ZipProcessor.py")
+  (respond2 `(p "Here")))
+  ;(respond2 `(p "Simple test passed")))
+
+(define (intial)
+  (respond2 `(form (input (@ (id "click") (name "click") (class "hidden")))
+     (p (button (@ (type "submit")) "Run python")))))
+
+(define (python-test)
+  (let ([clicked (string-param "click" params)])
+    (if clicked
+        (run-program)
+        (intial))))
+
 
 ;(table-test)
 ;(drop-test)
-(basic-test)
+;(basic-test)
 
+(python-test)

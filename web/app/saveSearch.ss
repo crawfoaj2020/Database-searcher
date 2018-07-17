@@ -44,7 +44,7 @@
      (tr (td (p "Name")) (td (p (textarea (@ (id "name") (name "name") (class "textBox"))))))
      (tr (td (p "Description")) (td (p (textarea (@ (id "desc") (name "desc") (class "desc")))))))
     (p (button (@ (type "submit")) "Save"))
-    (input (@ (id "sql") (name "sql") (class "hidden") (value ,sql)))))))
+    (input (@ (id "sql") (name "sql")  (value ,sql)))))))
 
 (define (save-query name desc sql)
    (match (db:transaction 'log-db (lambda () (execute  (format "insert into searches (name, description, sqlite)
@@ -58,9 +58,10 @@ values ('~a', '~a', '~a')" name desc sql))))
   (let ([name (string-param-sql "name" params)]
         [desc (string-param-sql "desc" params)]
         [sql (string-param-sql "sql" params)])
-    (if name
-        (save-query name desc sql)
-        (intial-setup))))
+    (respond `(p ,sql))))
+    ;; (if name
+    ;;     (save-query name desc sql)
+    ;;     (intial-setup))))
 
 (dispatch)
   

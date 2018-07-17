@@ -4,8 +4,8 @@ const ipcRenderer = require('electron').ipcRenderer;
 var kill = require('tree-kill');
 var path = require('path')
 const spawn = require('cross-spawn');
-// const child = spawn('./go');
-const child = spawn('./go', {detached: true});
+const child = spawn('./go');
+//const child = spawn('./go', {detached: true});
 
 let mainWindow
 
@@ -18,7 +18,13 @@ function createWindow () {
   mainWindow.maximize()
   mainWindow.show()
 
-  mainWindow.loadURL('http://localhost:54321');
+  try{
+    mainWindow.loadURL('http://127.0.0.1:54321');
+  }
+  catch(e){
+    mainWindow.loadURL('http://localhost:54321/app/saved?type=database&sql=&limit=100&offset=0&flag=An+Error+occured+so+returned+home+please+see+debug+tab+for+more+information')
+  }
+    
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -37,8 +43,8 @@ app.on('window-all-closed', function () {
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     app.quit();
-    const child = require('child_process')
-    const killed = child.exec('taskkill /f /im swish.exe');
+    const childProc = require('child_process')
+    const killed = childProc.exec('taskkill /f /im swish.exe');
   }
 })
 
