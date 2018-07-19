@@ -99,7 +99,7 @@
       (link "saved?type=search&sql=&limit=100&offset=0" "Saved searches")
       (link "search" "Search")
       (link "query-db" "Advanced search")
-      (link "saved?type=folder&sql=&limit=100&offset=0" "Convert log files")
+      (link "converter" "Convert log files")
       (link "drop" "Testing")
       (link "/swish/errors?type=child&sql=&limit=100&offset=0" "Debug")
     (active-database))))

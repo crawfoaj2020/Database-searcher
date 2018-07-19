@@ -4,8 +4,8 @@ const ipcRenderer = require('electron').ipcRenderer;
 var kill = require('tree-kill');
 var path = require('path')
 const spawn = require('cross-spawn');
-const child = spawn('./go');
-//const child = spawn('./go', {detached: true});
+//const child = spawn('./go');
+const child = spawn('./go', {detached: true});
 
 let mainWindow
 
