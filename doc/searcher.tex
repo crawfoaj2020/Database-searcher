@@ -1,0 +1,71 @@
+\documentclass[letterpaper,11pt,twoside,final]{article}
+\usepackage{sagian}
+
+\begin{document}
+
+\title{Database Searcher and Log File Converter Design}
+\author{Alyssa Crawford}
+\date{July 25, 2018}
+\coverpage
+
+\section*{Introduction}
+The database searcher and log file converter is a stand-alone
+application built to faciliate easy retrival of information from instrument
+log files, both sqlite files and .log files. It was built with the
+needs of tech support in mind, however other parties may also find it
+useful.
+
+This application uses the Swish Concurrency Engine to... and Electron
+to ...
+
+The Gallios Simulator is a stand-alone application that simulates a
+single Gallios instrument connected to CytoLink. Its goal is to
+provide a flexible way to use the Kaluza Acquisition software without
+a Gallios instrument for training, demonstrations, and sales.
+
+The simulator is implemented using the Swish Concurrency Engine, which
+is based on the DxN Diagnostics Server. Like the Gallios firmware, it
+communicates using the CRS Communication Specification. See the
+following documents in EDMS for more details:
+\begin{itemize}
+\item Kaluza-G 1.0-2.3.2.7.008, The Swish Concurrency Engine Design
+\item Kaluza-G 1.0-2.3.2.7.009, CRS Communication Specification
+\item DxN 2.3.2.3.2.009, DxN Diagnostics Server Design
+\end{itemize}
+
+\section*{Theory of Operation}
+
+The simulator runs as a Windows service and is configured to restart
+automatically 10 seconds after a failure. The failure is logged to the
+log file, and an event is logged to the Windows event log.
+
+Like CytoLink, the simulator listens on TCP/IP port 1400 for clients
+to send command packets to and receive response packets from the
+Gallios instrument. The simulator also listens on TCP/IP port 1401 for
+a single client to receive data packets.
+
+Web browsers access the simulator with the HTTP protocol on TCP/IP
+port 54321. The web pages use jQuery (\url{http://jquery.com}) and
+Twitter Bootstrap (\url{http://getbootstrap.com}).
+
+The simulator's main page allows users to define and load multiple
+32-position carousels. Users can add, rename, and delete
+carousels. Users can view and select the active carousel and can view
+each tube position within the carousel. For each tube position, users
+can mark it as empty, use the default FCS file, or upload an FCS/LMD
+file. Users can also view and edit the Gallios detector mapping for
+each tube.
+
+The main page has a control for viewing and setting the Gallios
+configuration to one of: 6 colors, 2 lasers; 8 colors, 2 lasers; and
+10 colors, 3 lasers.
+
+The simulator also has a developer page with controls for raising
+errors, turning CytoLink on and off, enabling and disabling the
+connection timeout, turning the Gallios on and off, setting the
+Gallios state, and setting and removing the event limit.
+
+
+
+
+\end{document}

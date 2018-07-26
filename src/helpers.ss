@@ -32,7 +32,8 @@
    containsStr?
    slist->string
    string-replace
-   flatten)
+   flatten
+   valid-file)
   (import
    (chezscheme)
    (swish imports))
@@ -113,6 +114,11 @@
          (else
           (cons (car list) (flatten (cdr list))))))
 
+
+(define (valid-file file-path)
+  (match (catch (read-file file-path))
+    [#(EXIT ,details) #f]
+    [,value #t]))
 )
 
 

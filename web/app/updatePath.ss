@@ -29,12 +29,17 @@
     [(_ c1 c2 ...)
       (hosted-page "Database changed" 
        '()
-        c1 c2 ...)]))
+        c1 c2 ...)])) 
 
 (define (dispatch)
-  (let ([val (string-param "val" params)])
-    (user-log-path val)
-    (respond `(p "Active database was changed to:") `(p ,(get-database-name))
-      (link "search"  "Go to search page"))))
+  (let* ([val (string-param "val" params)]
+         [valid (valid-file val)])
+    (if valid
+        (begin
+          (user-log-path val)
+          (respond `(p "Active database was changed to:") `(p ,(get-database-name))
+            (link "search"  "Go to search page")))
+        (respond `(p "This database no longer exists in your computer's memory at the specified location. Remove now?") (link (format "confirm-delete?type=database&val=~a" (http:percent-encode val)) "Delete database")))))
+
 
 (dispatch)

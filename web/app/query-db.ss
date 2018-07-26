@@ -88,7 +88,7 @@
   (do-query db sql limit offset "" (lambda x x)))
 
 (define (home-link last-sql)
-  (link (format "saveSearch?sql=~a" last-sql) "Save search"))
+  (link (format "saveSearch?sql=~a" (http:percent-encode last-sql)) "Save search"))
 
 
 

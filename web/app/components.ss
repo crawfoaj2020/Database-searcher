@@ -100,7 +100,6 @@
       (link "search" "Search")
       (link "query-db" "Advanced search")
       (link "converter" "Convert log files")
-      (link "drop" "Testing")
       (link "/swish/errors?type=child&sql=&limit=100&offset=0" "Debug")
     (active-database))))
 

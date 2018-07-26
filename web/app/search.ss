@@ -33,17 +33,16 @@
 (define (respond:error reason)
   (respond
    (match reason
-     [#(no-table) (section "Search failed" `(p "You must select a table"))]
+     [#(no-table) (section "Search failed" `(p "You must select a table") (link "Search" "Go Back"))]
      
-     [#(search-term-or-column-empty) (section "Search failed" `(p "If you specify a column, you must specify a search term. Similarly, if you specify a search term you must specify a column"))]
+     [#(search-term-or-column-empty) (section "Search failed" `(p "If you specify a column, you must specify a search term. Similarly, if you specify a search term you must specify a column")(link "Search" "Go Back"))]
 
-     [#(min-or-max-empty) (section "Search failed" `(p "You must enter both a min and a max if you want to limit by time"))]
+     [#(min-or-max-empty) (section "Search failed" `(p "You must enter both a min and a max if you want to limit by time")(link "Search" "Go Back"))]
      
-     [#(no-timestamp) (section "Search failed: no timestamp" `(p "Please select a table with that has a column named timestamp in order to search by timestamp"))]
+     [#(no-timestamp) (section "Search failed: no timestamp" `(p "Please select a table with that has a column named timestamp in order to search by timestamp")(link "Search" "Go Back"))]
      
      [,_
-      (section "Query failed" `(p ,(exit-reason->english reason)))])
-   (section "" (link "Search" "Go Back"))))
+      (section "Query failed" `(p ,(exit-reason->english reason)) (link "Search" "Go Back"))])))
 
 
 
@@ -112,7 +111,7 @@
                  (cons "where" ls)
                  ls)]
          
-         [ls (cons search-table ls)]
+         [ls (cons (string-append "[" search-table "]") ls)]
          [ls (cons "from" ls)]
          [timestamp?  (if (containsStr? all-cols "timestamp")
                           #t
@@ -239,10 +238,12 @@ select.addEventListener('change', updateColumnOrder, false);")
       (schema->html db-tables)))))
 
 (define (home-link last-sql)
-  (link (format "saveSearch?sql=~a" last-sql) "Save search"))
+  `(a (@ (href ,(format "saveSearch?sql=~a"
+                  (http:percent-encode last-sql))))
+     "Save Search"))
 
 
-;;Runs each time something changes, calls intial-setup or do-query
+;;Runs each time page loaded, calls intial-setup or do-query
 (define (dispatch)
   (let ([keyword (string-param-sql "keyWord" params)]
         [table (string-param "table" params)]
@@ -256,15 +257,6 @@ select.addEventListener('change', updateColumnOrder, false);")
     (unless (user-log-path)
       (respond `(p "Please select a database first")))
 
-    ;Start to fixing fact breaks if select deleted database, works for positive case, hangs indeviently for - case
-    ;; (catch #t
-    ;;   (with-db [db (user-log-path) SQLITE_OPEN_READONLY]
-    ;;     (respond `(p "Opened database")))
-    ;;   ((respond `(p "NOPE invalid")))))) 
-      
-
-    
-
     (match (catch (with-db [db (user-log-path) SQLITE_OPEN_READONLY]
                     (cond
                      [(previous-sql-valid? sql) (do-query db sql limit offset "" (lambda x x))]
@@ -274,7 +266,6 @@ select.addEventListener('change', updateColumnOrder, false);")
                           [#(EXIT ,reason) (respond:error reason)]
                           [,value (do-query db value limit offset "" (lambda x x))]))]
                      [else (intial-setup db)]))))))
-    
     
 
 (dispatch)

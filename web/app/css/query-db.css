@@ -67,12 +67,12 @@ textarea.sql {
 }
 
 .wide{
-    max-width: 250px;
+    max-width: 350px;
     min-width: 0px;
 }
 
 .extra-wide{
-    max-width: 350px;
+    max-width: 450px;
     min-width: 0px;
 }
 

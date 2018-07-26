@@ -48,15 +48,17 @@
         [type (get-param "type")]
         [sql (string-param "sql" params)]
         [search-func (lambda (name desc sqlite delete)
-                       (list
-                        (link (format "query-db?limit=100&offset=0&sql=~a" sqlite) (format "~a" name))
-                        desc sqlite
-                        (link (format "confirm-delete?type=search&val=~a" sqlite)  "Delete")))]
+                       (let ([display-name (if (string=? name "") "()" name)])
+                         (list
+                          (link (format "query-db?limit=100&offset=0&sql=~a" (http:percent-encode sqlite)) (format "~a" display-name))
+                          desc sqlite
+                          (link (format "confirm-delete?type=search&val=~a" (http:percent-encode sqlite))  "Delete"))))]
         [data-func (lambda (name desc filePath delete)
-                     (list
-                      (link (format "updatePath?val=~a" filePath) (format "~a" name))
-                       desc filePath
-                       (link (format "confirm-delete?type=database&val=~a" filePath) "Delete")))])
+                     (let ([display-name (if (string=? name "") "()" name)])
+                       (list
+                        (link (format "updatePath?val=~a" (http:percent-encode filePath)) (format "~a" display-name))
+                        desc filePath
+                        (link (format "confirm-delete?type=database&val=~a" (http:percent-encode filePath)) "Delete"))))])
                        
     
    (let ([sql (if (previous-sql-valid? sql)

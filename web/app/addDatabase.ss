@@ -52,6 +52,16 @@
 document.getElementById('file-path').value = x} $('.path').bind('change', func).trigger('change')")
     (p (button (@ (type "submit")) "Save")))))
 
+(define (intial-nofile file)
+   (respond `(form
+    (table
+     (tr (th (p "Field")) (th (p "Value")))
+     (tr (td (p "Name")) (td (p (textarea (@ (id "name") (name "name") (class "textBox"))))))
+     (tr (td (p "Description")) (td (p (textarea (@ (id "desc") (name "desc") (class "desc")))))))
+    (input (@ (id "file-path") (name "file-path") (class "hidden") (value ,file)))
+    (p (button (@ (type "submit")) "Save")))))
+     
+
 
 (define (update-path name desc file)
   (unless (not (string=? "undefined" file))
@@ -70,10 +80,11 @@ values ('~a', '~a', '~a')" name desc file))))
   (let ([name (string-param-sql "name" params)]
         [desc (string-param-sql "desc" params)]
         [file (string-param-sql "file-path" params)])
-    (if name
+    (cond [name
         (match (catch (update-path name desc file))
           [#(EXIT ,reason) (respond:error reason)]
-          [,value value])
-        (intial-setup))))
+          [,value value])]
+      [file (intial-nofile file)]
+      [else (intial-setup)])))
 
 (dispatch)

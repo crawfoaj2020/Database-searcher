@@ -9,6 +9,20 @@ const child = spawn('./go', {detached: true});
 
 let mainWindow
 
+//Only allow one instance
+const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore()
+        mainWindow.focus()
+    }
+})
+if (isSecondInstance) {
+    app.quit()
+}
+
+
+
 function createWindow () {
   // Create the browser window.
   
