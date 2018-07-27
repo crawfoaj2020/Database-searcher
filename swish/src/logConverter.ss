@@ -78,7 +78,7 @@
         (let ([n (string-length line)])
           (and (>= n 9)
                (string=? (substring line 0 9) "Method = ")
-               (substring line 9 (- n 1))))
+               (substring line 9 (- n 1)))))
 
         (define (parse-date-line line)
           ;; mm/dd/yyyy HH:MM:SS,

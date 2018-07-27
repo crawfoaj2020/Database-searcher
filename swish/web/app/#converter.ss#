@@ -50,7 +50,7 @@ document.getElementById('folder-path').value = x} $('.path').bind('change', func
               (script "function func(){var x = document.getElementById('dest').files[0].path;
 document.getElementById('dest-path').value = x} $('.path').bind('change', func).trigger('change')")
               (p (button (@ (type "submit")) "Convert")))
-    `(p "Depenidng on folder size the conversion may take a few minutes. If you leave this page the conversion will continue in the background. If you stay on this page you will be notifed when the conversion is complete")))
+    `(p "Depenidng on folder size the conversion may take a few minutes. If you leave this page the conversion will continue in the background. If you stay on this page you will be notifed when the conversion is complete.")))
 
 (define (do-conversion src dest name)
   (unless (not (string=? "undefined" src))
