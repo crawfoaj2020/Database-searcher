@@ -1,0 +1,16 @@
+{
+ "name": "swish",
+ "version": "1.0.0",
+ "description": "swish concureency engine",
+  "main": "runSwish.js",
+  "scripts": {
+    "stop": "taskkill -f -im swish.exe"
+
+  },
+ "author": "AJC",
+ "license": "ISC",
+ "dependencies": {
+  "cross-spawn": "^6.0.5",
+  "npm": "^6.2.0"
+ }
+}

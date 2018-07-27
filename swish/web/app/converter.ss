@@ -77,19 +77,19 @@ document.getElementById('dest-path').value = x} $('.path').bind('change', func).
 
 (define (dispatch)
   (let* ([status (get-convert-status)]
-        [src (string-param "folder-path" params)]
-        [dest (string-param "dest-path" params)]
-        [name (string-param "name" params)])
+         [src (string-param "folder-path" params)]
+         [dest (string-param "dest-path" params)]
+         [name (string-param "name" params)])
     (cond 
-      [(and src (string=? status ""))
-        (match (catch (do-conversion src dest name))
-          [#(EXIT ,reason) (respond:error reason)]
-          [,value value])]
-      [(string=? status "")
-           (get-paths)]
-      [(string=? status "Conversion complete")
-       (conversion-complete dest name)]
-      [else (respond `(p ,status) `(script "location.reload()"))])))
-        
+     [(and src (string=? status ""))
+      (match (catch (do-conversion src dest name))
+        [#(EXIT ,reason) (respond:error reason)]
+        [,value value])]
+     [(string=? status "")
+      (get-paths)]
+     [(string=? status "Conversion complete")
+      (conversion-complete dest name)]
+     [else (respond `(p ,status) `(script "location.reload()"))])))
+
 (dispatch)
 

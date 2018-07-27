@@ -20,8 +20,8 @@
       [,version (raise `#(unsupported-db-version ,schema-name ,version))]))    
 
   (define (create-db)
-    (execute "create table if not exists databases (name text, description text, file_path text primary key)")
-    (execute "create table if not exists searches (name text, description text, sqlite text primary key)")
+    (execute "create table if not exists database (name text, description text, file_path text primary key)")
+    (execute "create table if not exists search (name text, description text, sqlite text primary key)")
     )
 
   (define user-log-path (make-parameter #f))

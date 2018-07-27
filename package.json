@@ -1,11 +1,11 @@
 {
- "name": "pythonelectron",
+ "name": "InformationAcessor",
  "version": "1.0.0",
- "description": "Python test",
+ "description": "A program that facilitates easy database searching and log file converting",
  "main": "main.js",
- "scripts": {
-  "start": "electron ."
- },
+  "scripts": {
+    "start": "electron ."
+  },
  "author": "AJC",
  "license": "ISC",
  "devDependencies": {

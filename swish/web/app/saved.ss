@@ -43,8 +43,8 @@
 (define (dispatch)
   (let ([limit (integer-param "limit" 0 params)]
         [offset (integer-param "offset" 0 params)]
-        [search-sql "Select name, description, sqlite, null as [delete] from searches order by name collate nocase"]
-        [data-sql "Select name, description, file_path, null as [delete] from databases order by name collate nocase"]
+        [search-sql "Select name, description, sqlite, null as [delete] from search order by name collate nocase"]
+        [data-sql "Select name, description, file_path, null as [delete] from database order by name collate nocase"]
         [type (get-param "type")]
         [sql (string-param "sql" params)]
         [search-func (lambda (name desc sqlite delete)
@@ -59,18 +59,18 @@
                         (link (format "updatePath?val=~a" (http:percent-encode filePath)) (format "~a" display-name))
                         desc filePath
                         (link (format "confirm-delete?type=database&val=~a" (http:percent-encode filePath)) "Delete"))))])
-                       
     
-   (let ([sql (if (previous-sql-valid? sql)
+    
+    (let ([sql (if (previous-sql-valid? sql)
                    sql
                    (match type
                      ["database" data-sql]
                      ["search" search-sql]))]
-         [func (match type
-                 ["database" data-func]
-                 ["search" search-func])])
-        
-    (with-db [db (log-path) SQLITE_OPEN_READONLY]
-          (do-query db sql limit offset type func)))))
+          [func (match type
+                  ["database" data-func]
+                  ["search" search-func])])
+      
+      (with-db [db (log-path) SQLITE_OPEN_READONLY]
+        (do-query db sql limit offset type func)))))
 
 (dispatch)

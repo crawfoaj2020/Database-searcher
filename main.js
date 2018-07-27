@@ -1,11 +1,9 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow} = require('electron');
 const ipcRenderer = require('electron').ipcRenderer;
-var kill = require('tree-kill');
 var path = require('path')
-const spawn = require('cross-spawn');
-//const child = spawn('./go');
-const child = spawn('./go', {detached: true});
+const swish = require('./swish');
+
 
 let mainWindow
 
@@ -57,8 +55,6 @@ app.on('window-all-closed', function () {
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     app.quit();
-    const childProc = require('child_process')
-    const killed = childProc.exec('taskkill /f /im swish.exe');
   }
 })
 

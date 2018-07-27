@@ -24,10 +24,8 @@
 (import (helpers))
 
 ;; HTTP/HTML responses
-
 (define (get-page-name)
   "Log database query")
-
 
 (define (respond:error reason sql)
   (respond
@@ -40,7 +38,6 @@
       (section "Query failed" `(p ,(exit-reason->english reason)))])))
 
 ;; Home page
-
 (define (do-home db last-sql)
   (define (table-info master-row)
     (match master-row
@@ -70,8 +67,6 @@
      (section "Schema"
        (schema->html db-tables)))))
 
-
-
 (define (check-run-query db sql limit offset)
   (define (check-request)
     (cond
@@ -91,9 +86,7 @@
   (link (format "saveSearch?sql=~a" (http:percent-encode last-sql)) "Save search"))
 
 
-
 ;; Dispatching requests
-
 (define (dispatch)
   (let ([sql (string-param "sql" params)]
         [last-sql (string-param "lastSql" params)]

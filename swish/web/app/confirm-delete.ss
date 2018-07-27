@@ -27,9 +27,9 @@
 (define-syntax respond
   (syntax-rules ()
     [(_ c1 c2 ...)
-      (hosted-page "Confirm delete" 
-        (list (css-include "css/confirm-delete.css"))
-        c1 c2 ...)]))
+     (hosted-page "Confirm delete" 
+       (list (css-include "css/confirm-delete.css"))
+       c1 c2 ...)]))
 
 (define (display message value link type)
   (respond message `(p ,value) 
@@ -39,33 +39,27 @@
                                      (input (@ (id "val") (name "val") (class "hidden") (value ,value)))
                                      (input (@ (id "type") (name "type") (class "hidden") (value ,type)))
                                      (p (button (@ (type "submit")) "Delete"))))))))
-    
+
 
 (define (delete-and-show-confirmation value type)
   (define (return-to-saved)
-    (let ([redirct-loc (match type
-                     ["database" "/app/saved?type=database&sql=&limit=100&offset=0&flag=Delete+Successful"]
-                         ["search" "/app/saved?type=search&sql=&limit=100&offset=0&flag=Delete+Successful"])])
-       (redirect redirct-loc)))
+    (match type
+      ["database" (redirect "/app/saved?type=database&sql=&limit=100&offset=0&flag=Delete+Successful")]
+      ["search" (redirect "/app/saved?type=search&sql=&limit=100&offset=0&flag=Delete+Successful")]))
   
-  (let ([database-name (match type
-                         ["database" "databases"]
-                         ["search" "searches"])]
-        [column (match type
-                  ["database" "file_path"]
-                  ["search" "sqlite"])])
-    
-  (match (db:transaction 'log-db (lambda () (execute  (format "delete from ~a where ~a = '~a'" database-name column (string-replace value "'" "''")))))
+  (match (db:transaction 'log-db (lambda () (execute
+                                             (format "delete from ~a where ~a = '~a'" type
+                                               (match type ["database" "file_path"] ["search" "sqlite"])
+                                               (string-replace value "'" "''")))))
     [#(ok ,_) (return-to-saved)]
-    [,error (respond `(p ,error))])))
+    [,error (respond `(p ,error))]))
 
 
 (define (dispatch)
-  (let ([delete-clicked (string-param "click" params)]
-        [value (string-param "val" params)]
-        [type (get-param "type")])
-    
-    (let ([link
+  (let* ([delete-clicked (string-param "click" params)]
+         [value (string-param "val" params)]
+         [type (get-param "type")]
+         [link
           (match type
             ["database" (link "saved?type=database&sql=&limit=100&offset=0" "Cancel")]
             ["search"  (link "saved?type=search&sql=&limit=100&offset=0" "Cancel")])]
@@ -74,9 +68,9 @@
             ["database" `(p "Are you sure you wish to delete this database? \n The database will not be removed from memory, just from this application")]
             ["search" `(p "Are you sure you want to remove this search?")])])
 
-      (if delete-clicked
-          (delete-and-show-confirmation value type)
-          (display message value link type)))))
+    (if delete-clicked
+        (delete-and-show-confirmation value type)
+        (display message value link type))))
 
 
 (dispatch)

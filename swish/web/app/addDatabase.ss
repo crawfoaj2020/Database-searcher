@@ -27,10 +27,10 @@
 (define-syntax respond
   (syntax-rules ()
     [(_ c1 c2 ...)
-      (hosted-page "Add a new database"
-        (list (css-include "css/saveSearch.css")
-          (js-include "js/jquery-1.4.4.min.js"))
-        c1 c2 ...)]))
+     (hosted-page "Add a new database"
+       (list (css-include "css/saveSearch.css")
+         (js-include "js/jquery-1.4.4.min.js"))
+       c1 c2 ...)]))
 
 (define (respond:error reason)
   (respond
@@ -41,26 +41,26 @@
 
 (define (intial-setup)
   (respond `(form
-    (table
-     (tr (th (p "Field")) (th (p "Value")))
-     (tr (td (p "Name")) (td (p (textarea (@ (id "name") (name "name") (class "textBox"))))))
-     (tr (td (p "Description")) (td (p (textarea (@ (id "desc") (name "desc") (class "desc"))))))
-     (tr (td (p "File")) (td (p (input (@ (name "path") (class "path") (type "file") (id "path")))))))
-    (input (@ (id "file-path") (name "file-path") (class "hidden")))
-    (script "document.getElementById('testNot').value = 'WORK'")
-    (script "function func(){var x = document.getElementById('path').files[0].path;
+             (table
+              (tr (th (p "Field")) (th (p "Value")))
+              (tr (td (p "Name")) (td (p (textarea (@ (id "name") (name "name") (class "textBox"))))))
+              (tr (td (p "Description")) (td (p (textarea (@ (id "desc") (name "desc") (class "desc"))))))
+              (tr (td (p "File")) (td (p (input (@ (name "path") (class "path") (type "file") (id "path")))))))
+             (input (@ (id "file-path") (name "file-path") (class "hidden")))
+             (script "document.getElementById('testNot').value = 'WORK'")
+             (script "function func(){var x = document.getElementById('path').files[0].path;
 document.getElementById('file-path').value = x} $('.path').bind('change', func).trigger('change')")
-    (p (button (@ (type "submit")) "Save")))))
+             (p (button (@ (type "submit")) "Save")))))
 
 (define (intial-nofile file)
-   (respond `(form
-    (table
-     (tr (th (p "Field")) (th (p "Value")))
-     (tr (td (p "Name")) (td (p (textarea (@ (id "name") (name "name") (class "textBox"))))))
-     (tr (td (p "Description")) (td (p (textarea (@ (id "desc") (name "desc") (class "desc")))))))
-    (input (@ (id "file-path") (name "file-path") (class "hidden") (value ,file)))
-    (p (button (@ (type "submit")) "Save")))))
-     
+  (respond `(form
+             (table
+              (tr (th (p "Field")) (th (p "Value")))
+              (tr (td (p "Name")) (td (p (textarea (@ (id "name") (name "name") (class "textBox"))))))
+              (tr (td (p "Description")) (td (p (textarea (@ (id "desc") (name "desc") (class "desc")))))))
+             (input (@ (id "file-path") (name "file-path") (class "hidden") (value ,file)))
+             (p (button (@ (type "submit")) "Save")))))
+
 
 
 (define (update-path name desc file)
@@ -70,7 +70,7 @@ document.getElementById('file-path').value = x} $('.path').bind('change', func).
               (ends-with-ci? file ".db")
               (ends-with-ci? file ".sqlite"))
     (raise `#(not-database)))
-  (match (db:transaction 'log-db (lambda () (execute (format "insert into databases (name, description, file_path)
+  (match (db:transaction 'log-db (lambda () (execute (format "insert into database (name, description, file_path)
 values ('~a', '~a', '~a')" name desc file))))
     [#(ok ,_) (begin (user-log-path file) (redirect "saved?type=database&sql=&limit=100&offset=0&flag=Save+successful,+active+database+changed."))]
     [,error (respond:error error)]))
@@ -81,9 +81,9 @@ values ('~a', '~a', '~a')" name desc file))))
         [desc (string-param-sql "desc" params)]
         [file (string-param-sql "file-path" params)])
     (cond [name
-        (match (catch (update-path name desc file))
-          [#(EXIT ,reason) (respond:error reason)]
-          [,value value])]
+           (match (catch (update-path name desc file))
+             [#(EXIT ,reason) (respond:error reason)]
+             [,value value])]
       [file (intial-nofile file)]
       [else (intial-setup)])))
 

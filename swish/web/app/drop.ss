@@ -114,4 +114,6 @@ document.getElementById('testNot').value = x} $('.path').bind('change', func).tr
 ;(drop-test)
 ;(basic-test)
 
-(python-test)
+;(python-test)
+
+(respond2 `(p ,(user-log-path)))

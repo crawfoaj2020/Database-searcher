@@ -27,11 +27,11 @@
 (define-syntax respond
   (syntax-rules ()
     [(_ c1 c2 ...)
-      (hosted-page (get-page-name) 
-        (list (css-include "css/query-db.css")
-          (js-include "js/jquery-1.4.4.min.js")
-          (js-include "js/query-db.js"))
-        c1 c2 ...)]))
+     (hosted-page (get-page-name) 
+       (list (css-include "css/query-db.css")
+         (js-include "js/jquery-1.4.4.min.js")
+         (js-include "js/query-db.js"))
+       c1 c2 ...)]))
 
 ;; Running a query
 (define (do-query db sql limit offset type f)
@@ -106,10 +106,10 @@
       `(td (@ (class "wide")) ,text)]
      [else
       (let ([id (symbol->string (gensym))])
-          `(td (@ (class "extra-wide")) (div (@ (class ,(format "elide ~a" c)) (word-break "break-all"))
-            (input (@ (class "elide") (id ,id) (type "checkbox") (checked "yes")))
-            (label (@ (for ,id) (class "elide")) ,text))))])))
-     
+        `(td (@ (class "extra-wide")) (div (@ (class ,(format "elide ~a" c)) (word-break "break-all"))
+                                        (input (@ (class "elide") (id ,id) (type "checkbox") (checked "yes")))
+                                        (label (@ (for ,id) (class "elide")) ,text))))])))
+
 (define (data->html-table border columns rows f)
   (define (widths ls-cols)
     (let* ([num-cols (length ls-cols)]
@@ -117,16 +117,16 @@
            [max (round (* (/ 100 num-cols) 2))])
       `(@ (max-width ,max) (min-width ,min) )))
 
-           
+  
   (let ([columns (vector->list columns)])
     `(div (@ (class "dataCont"))
-    (table (@ (class "dataTable"))
-     (tbody
-       (tr ,@(map (lambda (c) `(th  ,c)) columns))
-       ,@(map
-          (lambda (row)
-            `(tr ,@(map make-td columns (apply f (vector->list row)))))
-          rows))))))
+       (table (@ (class "dataTable"))
+         (tbody
+          (tr ,@(map (lambda (c) `(th  ,c)) columns))
+          ,@(map
+             (lambda (row)
+               `(tr ,@(map make-td columns (apply f (vector->list row)))))
+             rows))))))
 
 
 
